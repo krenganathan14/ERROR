@@ -1,0 +1,65 @@
+/*
+#Error  : putty session timeout frequently. 
+*/
+#Solution:
+putty ->  change settings.. ->  connection -> set as 1 "secounds between keepalives" -> Apply.
+======================================================================================================================================
+/*
+#Error  : After installation of HBase => hbase shell => list => "ERROR: can't get master address from zookepper:znode data ==null"
+#Verify : jps => verify QuorumPeerMain,HMaster,HRegionServer and all other demanoes are running
+*/
+
+#Error: 
+hbase(main):001:0> list
+ERROR: can not get master address from zookepper:znode data ==null
+
+##Solution:
+#In my case just after installation of zookepper and hbase getting this error.So I tried following workaround,
+#1.stop and start all demanoes:Error Not CLEAR.
+#2.Restart VM and tried:Error Not CLEAR.
+#3.Removed hbase and zookeepr (/usr/local/hbase and /usr/local/zookeeper) and tried new installation:Error Not CLEAR.
+#4.Removed hbase dir from hadoop [hadoop fs -rmr /user/hduser/hbase] and restart all demanoes : ERROR CLEAR.
+
+======================================================================================================================================
+/*
+#Error  : MapReducer will get failed.
+#Verify : historyServer => Check corresponding MapReduce Job ID XXXXXXXXXXXXXXXX error status it may show as "Exception from container-launch non-zero exit code 1"
+#Historyserver => History => map => failed =>
+*/
+
+#Error: 
+Exception from container-launch. Container id:
+container_1601739346707_0027_01_000002 Exit code: 1 Stack trace:
+ExitCodeException exitCode=1: at
+org.apache.hadoop.util.Shell.runCommand(Shell.java:545) at
+org.apache.hadoop.util.Shell.run(Shell.java:456) at
+org.apache.hadoop.util.Shell$ShellCommandExecutor.execute(Shell.java:722)
+at org.apache.hadoop.yarn.server.nodemanager.DefaultContainerExecutor.launchContainer(DefaultContainerExecutor.java:211)
+at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:302)
+at org.apache.hadoop.yarn.server.nodemanager.containermanager.launcher.ContainerLaunch.call(ContainerLaunch.java:82)
+at java.util.concurrent.FutureTask.run(FutureTask.java:266) at
+java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+at java.lang.Thread.run(Thread.java:745) Container exited with a
+non-zero exit code 1
+
+##Solution:
+#1.Go to mapred-site.xml and add below metioned cofiguration
+vi /usr/local/hadoop/etc/hadoop/mapred-site.xml
+<property>
+<name>mapreduce.map.java.opts</name>
+<value>-Xmx1600m</value>
+</property>
+<property>
+<name>mapreduce.reduce.java.opts</name>
+<value>-Xmx1600m</value>
+</property>
+#2.stop and start datanode and namenode:	
+stop-dfs.sh
+stop-yarn.sh
+start-dfs.sh
+start-yarn.sh
+=================================================================================================================================
+
+
+
